@@ -2,7 +2,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { InstallCard } from "@/components/install-card";
-import { fetchPackage, getLatestVersion, parseDepVersionRequirements } from "@/lib/wally";
+import {
+  fetchPackage,
+  getLatestVersion,
+  getVersionDate,
+  parseDepVersionRequirements,
+} from "@/lib/wally";
 import { getPackageDate } from "@/lib/registry";
 import { PackageCard } from "@/components/package-card";
 import { ComputerIcon, LicenseIcon } from "@hugeicons/core-free-icons";
@@ -28,9 +33,12 @@ export default async function PackagePage({
   const currentVersion = v
     ? (versions.find((ver) => ver.package.version === v) ?? latest)
     : latest;
+  console.log(v);
   const { package: pkg } = currentVersion;
   const packageName = `${scope}/${name}`;
-  const lastUpdated = getPackageDate(packageName);
+  const lastUpdated = v
+    ? await getVersionDate(scope, name, v)
+    : getPackageDate(packageName);
 
   const deps = Object.entries(currentVersion.dependencies);
   const serverDeps = Object.entries(currentVersion["server-dependencies"] ?? {});
@@ -61,7 +69,7 @@ export default async function PackagePage({
         </Badge>
         {lastUpdated && (
           <span className="ml-auto text-xs text-muted-foreground">
-            Last updated: {formatDate(lastUpdated)}
+            Released: {formatDate(lastUpdated)}
           </span>
         )}
       </div>

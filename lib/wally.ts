@@ -86,3 +86,51 @@ export function parseDepVersionRequirements(version: string) {
   const name = parts.slice(0, -1).join("@");
   return { ver, name };
 }
+
+interface GitHubCommit {
+  commit: {
+    message: string;
+    author: { date: string };
+  };
+}
+
+export async function getVersionDate(
+  scope: string,
+  name: string,
+  version: string,
+): Promise<string | null> {
+  const fullName = `${scope}/${name}`;
+  const targetMsg = `Publish ${fullName}@${version}`;
+  let url: string | null =
+    `https://api.github.com/repos/UpliftGames/wally-index/commits?path=${encodeURIComponent(fullName)}&per_page=100`;
+
+  try {
+    const res: Response = await fetch(url, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "wallylol",
+        Authorization: `Bearer ${process.env.GH_TOKEN}`,
+      },
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+
+    const commits = (await res.json()) as GitHubCommit[];
+    if (!Array.isArray(commits)) return null;
+
+    for (const c of commits) {
+      if (c.commit?.message === targetMsg) {
+        return c.commit.author?.date ?? null;
+      }
+    }
+
+    const link: string | null = res.headers.get("link");
+    const m: RegExpMatchArray | null = link?.match(/<([^>]+)>;\s*rel="next"/) ?? null;
+    url = m?.[1] ?? null;
+  } catch {
+    return null;
+  }
+
+  return null;
+}
