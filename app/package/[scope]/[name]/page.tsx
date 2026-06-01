@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { InstallCard } from "@/components/install-card";
 import { fetchPackage, getLatestVersion, parseDepVersionRequirements } from "@/lib/wally";
@@ -6,14 +7,17 @@ import { getPackageDate } from "@/lib/registry";
 import { PackageCard } from "@/components/package-card";
 import { ComputerIcon, LicenseIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { toTitleCase } from "@/lib/utils";
+import { formatDate, toTitleCase } from "@/lib/utils";
 
 export default async function PackagePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ scope: string; name: string }>;
+  searchParams: Promise<{ v?: string }>;
 }) {
   const { scope, name } = await params;
+  const { v } = await searchParams;
   const versions = await fetchPackage(scope, name);
 
   if (!versions) {
@@ -21,22 +25,16 @@ export default async function PackagePage({
   }
 
   const latest = getLatestVersion(versions);
-  const { package: pkg } = latest;
+  const currentVersion = v
+    ? (versions.find((ver) => ver.package.version === v) ?? latest)
+    : latest;
+  const { package: pkg } = currentVersion;
   const packageName = `${scope}/${name}`;
   const lastUpdated = getPackageDate(packageName);
 
-  const deps = Object.entries(latest.dependencies);
-  const serverDeps = Object.entries(latest["server-dependencies"] ?? {});
-  const devDeps = Object.entries(latest["dev-dependencies"] ?? {});
-
-  function formatDate(dateStr: string) {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
+  const deps = Object.entries(currentVersion.dependencies);
+  const serverDeps = Object.entries(currentVersion["server-dependencies"] ?? {});
+  const devDeps = Object.entries(currentVersion["dev-dependencies"] ?? {});
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -50,7 +48,9 @@ export default async function PackagePage({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 mb-4">
-        <Badge variant="secondary">v{pkg.version}</Badge>
+        <Badge variant="secondary" asChild>
+          <Link href={`/package/${scope}/${name}`}>v{pkg.version}</Link>
+        </Badge>
         {pkg.license && (
           <Badge variant="outline">
             <HugeiconsIcon icon={LicenseIcon} /> {pkg.license}
@@ -80,8 +80,9 @@ export default async function PackagePage({
                   <Badge
                     variant={v.package.version === pkg.version ? "default" : "secondary"}
                     className="font-mono mr-1"
+                    asChild
                   >
-                    {v.package.version}
+                    <Link href={`?v=${v.package.version}`}>{v.package.version}</Link>
                   </Badge>
                 </div>
               ))}
@@ -122,21 +123,22 @@ export default async function PackagePage({
             </section>
           ))}
 
-        {latest.place &&
-          (latest.place["server-packages"] || latest.place["shared-packages"]) && (
+        {currentVersion.place &&
+          (currentVersion.place["server-packages"] ||
+            currentVersion.place["shared-packages"]) && (
             <section>
               <h2 className="text-xl font-semibold">Place Configuration</h2>
               <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {latest.place["shared-packages"] && (
+                {currentVersion.place["shared-packages"] && (
                   <p>
                     <span className="font-medium text-foreground">Shared packages:</span>{" "}
-                    {latest.place["shared-packages"]}
+                    {currentVersion.place["shared-packages"]}
                   </p>
                 )}
-                {latest.place["server-packages"] && (
+                {currentVersion.place["server-packages"] && (
                   <p>
                     <span className="font-medium text-foreground">Server packages:</span>{" "}
-                    {latest.place["server-packages"]}
+                    {currentVersion.place["server-packages"]}
                   </p>
                 )}
               </div>
