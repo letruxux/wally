@@ -136,3 +136,15 @@ export async function getVersionDate(
 
   return null;
 }
+
+export type CasingType = "original" | "caps";
+
+export function convertCasing(name: string, type: CasingType) {
+  if (type === "original") return name;
+  return name
+    .toLowerCase()
+    .replaceAll("-", " ")
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("");
+}

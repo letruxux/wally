@@ -1,0 +1,32 @@
+{
+  "lm-loleris": {
+    "name": "lm-loleris",
+    "github_link": "https://github.com/MadStudioRoblox",
+    "badges": "trusted"
+  },
+  "ukendio": {
+    "name": "ukendio",
+    "github_link": "https://github.com/ukendio",
+    "badges": "trusted"
+  },
+  "roblox": {
+    "name": "roblox",
+    "github_link": "https://github.com/roblox",
+    "badges": "roblox"
+  },
+  "sleitnick": {
+    "name": "sleitnick",
+    "github_link": "https://github.com/sleitnick",
+    "badges": "trusted"
+  },
+  "evaera": {
+    "name": "evaera",
+    "github_link": "https://github.com/evaera",
+    "badges": "trusted"
+  },
+  "littensy": {
+    "name": "littensy",
+    "github_link": "https://github.com/littensy",
+    "badges": "trusted"
+  }
+}

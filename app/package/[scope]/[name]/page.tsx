@@ -10,10 +10,18 @@ import {
 } from "@/lib/wally";
 import { getPackageDate } from "@/lib/registry";
 import { PackageCard } from "@/components/package-card";
-import { ComputerIcon, LicenseIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight,
+  ComputerIcon,
+  GithubIcon,
+  LicenseIcon,
+  PackageIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDate, toTitleCase } from "@/lib/utils";
 import type { Metadata } from "next";
+import { getProjectInfo } from "@/lib/custom-data";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 interface PageMetadata {
   params: Promise<{ scope: string; name: string }>;
@@ -31,7 +39,7 @@ export async function generateMetadata({ params }: PageMetadata): Promise<Metada
 
 export default async function PackagePage({ params, searchParams }: PageMetadata) {
   const { scope, name } = await params;
-  const { v } = await searchParams;
+  const { v: version } = await searchParams;
   const versions = await fetchPackage(scope, name);
 
   if (!versions) {
@@ -39,15 +47,15 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
   }
 
   const latest = getLatestVersion(versions);
-  const currentVersion = v
-    ? (versions.find((ver) => ver.package.version === v) ?? latest)
+  const currentVersion = version
+    ? (versions.find((ver) => ver.package.version === version) ?? latest)
     : latest;
-  console.log(v);
   const { package: pkg } = currentVersion;
   const packageName = `${scope}/${name}`;
-  const lastUpdated = v
-    ? await getVersionDate(scope, name, v)
+  const lastUpdated = version
+    ? await getVersionDate(scope, name, version)
     : getPackageDate(packageName);
+  const projectInfo = getProjectInfo(packageName);
 
   const deps = Object.entries(currentVersion.dependencies);
   const serverDeps = Object.entries(currentVersion["server-dependencies"] ?? {});
@@ -76,6 +84,18 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
         <Badge variant="outline">
           <HugeiconsIcon icon={ComputerIcon} /> {toTitleCase(pkg.realm)}
         </Badge>
+        {projectInfo?.deprecated && (
+          <Badge variant="destructive">
+            <HugeiconsIcon icon={PackageIcon} /> Deprecated
+          </Badge>
+        )}
+        {projectInfo?.github_link && (
+          <a href={projectInfo.github_link} target="_blank" rel="noreferrer">
+            <Badge variant="link" className="text-white">
+              <HugeiconsIcon icon={GithubIcon} /> View on GitHub
+            </Badge>
+          </a>
+        )}
         {lastUpdated && (
           <span className="ml-auto text-xs text-muted-foreground">
             Released: {formatDate(lastUpdated)}
@@ -83,7 +103,31 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
         )}
       </div>
 
-      <InstallCard scope={scope} name={name} version={pkg.version} />
+      {projectInfo?.deprecation_message && (
+        <Card className="bg-red-600/15 mb-4 gap-y-2">
+          <CardContent>
+            <HugeiconsIcon icon={PackageIcon} className="mr-2 inline-block" />
+            {projectInfo.deprecation_message}
+          </CardContent>
+          <CardFooter className="text-xs flex items-center">
+            <HugeiconsIcon icon={ArrowRight} className="mr-2 inline-block" size={16} />
+            Recommended alternative:
+            <a
+              href={`/package/${projectInfo.recommended_alternative}`}
+              className="hover:underline text-blue-400"
+            >
+              <code className="ml-1 px-2 py-1 rounded-lg border bg-muted/30">
+                {projectInfo.recommended_alternative}
+              </code>
+            </a>
+          </CardFooter>
+        </Card>
+      )}
+
+      <section>
+        <h2 className="text-xl font-semibold mb-4">Install</h2>
+        <InstallCard scope={scope} name={name} version={pkg.version} />
+      </section>
 
       <div className="mt-4 space-y-8">
         <section>
@@ -140,7 +184,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
             </section>
           ))}
 
-        {currentVersion.place &&
+        {/* {currentVersion.place &&
           (currentVersion.place["server-packages"] ||
             currentVersion.place["shared-packages"]) && (
             <section>
@@ -160,7 +204,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
                 )}
               </div>
             </section>
-          )}
+          )} */}
       </div>
     </div>
   );

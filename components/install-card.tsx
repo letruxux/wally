@@ -1,8 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SlidersHorizontalIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CasingType, convertCasing } from "@/lib/wally";
+import { useLocalStorage } from "usehooks-ts";
 
 export function InstallCard({
   scope,
@@ -13,61 +29,140 @@ export function InstallCard({
   name: string;
   version: string;
 }) {
-  const shortName = name.split("/").pop()!;
-  const tomlLine = `${shortName} = "${scope}/${name}@${version}"`;
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const [pinVersion, setPinVersion] = useLocalStorage("pin-version", true);
+  const [packageNameCasing, setPackageNameCasing] = useLocalStorage<CasingType>(
+    "package-name-casing",
+    "original",
+  );
+
+  const shortName = useMemo(() => {
+    return name.split("/").pop()!;
+  }, [name]);
+
+  const tomlLine = useMemo(() => {
+    const withCasing = convertCasing(shortName, packageNameCasing);
+    if (pinVersion) return `${withCasing} = "${scope}/${name}@${version}"`;
+    return `${withCasing} = "${scope}/${name}"`;
+  }, [pinVersion, shortName, scope, name, version, packageNameCasing]);
+
+  const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(tomlLine);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [tomlLine]);
+
+  const handleDownload = useCallback(async () => {
+    const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
+    const res = await fetch(url, {
+      headers: { "Wally-Version": "0.3.2" },
+    });
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${scope}-${name}-${version}.zip`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, [scope, name, version]);
 
   return (
-    <section>
-      <h2 className="text-xl font-semibold">Install</h2>
-      <Card className="mt-4 p-2">
-        <CardContent className="p-2 gap-y-2 flex flex-col w-full">
-          <div
-            className="flex items-center justify-between gap-4 rounded-lg border bg-muted/30 px-3 py-2.5 cursor-pointer transition-colors hover:bg-muted/60"
-            onClick={handleCopy}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") handleCopy();
-            }}
-          >
-            <code className="text-sm font-mono break-all">{tomlLine}</code>
-            <span className="text-xs text-muted-foreground shrink-0">
-              {copied ? "Copied!" : "Click to copy"}
-            </span>
-          </div>
+    <Card className="p-2">
+      <CardContent className="p-2 gap-y-2 flex flex-col w-full">
+        <div
+          className="flex items-center justify-between gap-4 rounded-lg border bg-muted/30 px-3 py-2.5 cursor-pointer transition-colors hover:bg-muted/60"
+          onClick={handleCopy}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") handleCopy();
+          }}
+        >
+          <code className="text-sm font-mono break-all">{tomlLine}</code>
+          <span className="text-xs text-muted-foreground shrink-0">
+            {copied ? "Copied!" : "Click to copy"}
+          </span>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              ...or download it as a .zip file
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
-                const res = await fetch(url, {
-                  headers: { "Wally-Version": "0.3.2" },
-                });
-                const blob = await res.blob();
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `${scope}-${name}-${version}.zip`;
-                a.click();
-                URL.revokeObjectURL(a.href);
-              }}
-            >
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            ...or download it as a .zip file
+          </p>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={handleDownload}>
               Download
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon-sm">
+                  <HugeiconsIcon icon={SlidersHorizontalIcon} />
+                </Button>
+              </DropdownMenuTrigger>
+              <InstallCardSettings
+                pinVersion={pinVersion}
+                setPinVersion={setPinVersion}
+                packageNameCasing={packageNameCasing}
+                setPackageNameCasing={setPackageNameCasing}
+                shortName={shortName}
+              />
+            </DropdownMenu>
           </div>
-        </CardContent>
-      </Card>
-    </section>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function InstallCardSettings({
+  pinVersion,
+  setPinVersion,
+  packageNameCasing,
+  setPackageNameCasing,
+  shortName,
+}: {
+  pinVersion: boolean;
+  setPinVersion: (v: boolean) => void;
+  packageNameCasing: CasingType;
+  setPackageNameCasing: (v: CasingType) => void;
+  shortName: string;
+}) {
+  return (
+    <DropdownMenuContent className="w-40" align="start">
+      <DropdownMenuGroup>
+        <DropdownMenuLabel>
+          <code>wally.toml</code>
+        </DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          onSelect={(e) => e.preventDefault()}
+          checked={pinVersion}
+          onCheckedChange={setPinVersion}
+        >
+          Pin specific version
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Package name casing</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuCheckboxItem
+                onSelect={(e) => e.preventDefault()}
+                checked={packageNameCasing === "original"}
+                onCheckedChange={() => setPackageNameCasing("original")}
+              >
+                Original:{" "}
+                <span className="font-mono">{convertCasing(shortName, "original")}</span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onSelect={(e) => e.preventDefault()}
+                checked={packageNameCasing === "caps"}
+                onCheckedChange={() => setPackageNameCasing("caps")}
+              >
+                Caps:{" "}
+                <span className="font-mono">{convertCasing(shortName, "caps")}</span>
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      </DropdownMenuGroup>
+    </DropdownMenuContent>
   );
 }
