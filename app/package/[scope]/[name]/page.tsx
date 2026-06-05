@@ -129,7 +129,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       )}
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Install</h2>
+        <h2 className="text-xl font-semibold mb-4">Get</h2>
         <InstallCard scope={scope} name={name} version={pkg.version} />
       </section>
 
