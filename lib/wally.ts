@@ -1,3 +1,5 @@
+import { compare } from "semver";
+
 export interface WallyPackage {
   name: string;
   version: string;
@@ -49,7 +51,7 @@ export async function fetchPackage(
 
 export function getLatestVersion(versions: WallyVersion[]): WallyVersion {
   return versions.reduce((latest, v) => {
-    if (v.package.version > latest.package.version) return v;
+    if (compare(v.package.version, latest.package.version) > 0) return v;
     return latest;
   }, versions[0]);
 }
