@@ -13,6 +13,7 @@ import { PackageCard } from "@/components/package-card";
 import {
   ArrowRight,
   ComputerIcon,
+  EyeIcon,
   GithubIcon,
   LicenseIcon,
   PackageIcon,
@@ -129,7 +130,14 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       )}
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Get</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Get{" "}
+          <Link href={`/preview/${scope}/${name}?v=${pkg.version}`}>
+            <Badge variant="outline" className="cursor-pointer hover:bg-muted/50">
+              <HugeiconsIcon icon={EyeIcon} /> Preview
+            </Badge>
+          </Link>
+        </h2>
         <InstallCard scope={scope} name={name} version={pkg.version} />
       </section>
 

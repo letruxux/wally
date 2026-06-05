@@ -145,7 +145,7 @@ export function ReadmeViewer({
                 code: ({ children }: ComponentProps<"code">) => {
                   const isMultiline =
                     typeof children === "string" && children.includes("\n");
-                  console.log(isMultiline);
+
                   return (
                     <code
                       className={cn(
@@ -155,6 +155,19 @@ export function ReadmeViewer({
                     >
                       {children}
                     </code>
+                  );
+                },
+                pre: ({ children, ...props }: ComponentProps<"pre">) => {
+                  return (
+                    <pre
+                      {...props}
+                      className={cn(
+                        props.className,
+                        "bg-accent border text-foreground wally:bg-black/30",
+                      )}
+                    >
+                      {children}
+                    </pre>
                   );
                 },
               }}
@@ -170,7 +183,7 @@ export function ReadmeViewer({
           <Button
             variant="secondary"
             size="sm"
-            className="mx-auto block"
+            className="mx-auto block mt-4"
             onClick={() => setExpanded(!expanded)}
           >
             {expanded ? "View less" : "View more"}{" "}
