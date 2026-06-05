@@ -23,6 +23,7 @@ import type { Metadata } from "next";
 import { getProjectInfo } from "@/lib/custom-data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ReadmeViewer } from "@/components/readme-viewer";
+import { getLicenseUrl } from "@/lib/licenses";
 
 interface PageMetadata {
   params: Promise<{ scope: string; name: string }>;
@@ -78,7 +79,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
           <Link href={`/package/${scope}/${name}`}>v{pkg.version}</Link>
         </Badge>
         {pkg.license && (
-          <a href="https://choosealicense.com/appendix/" target="_blank" rel="noreferrer">
+          <a href={getLicenseUrl(pkg.license)} target="_blank" rel="noreferrer">
             <Badge variant="outline">
               <HugeiconsIcon icon={LicenseIcon} /> {pkg.license}
             </Badge>
