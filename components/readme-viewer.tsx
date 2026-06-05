@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 import JSZip from "jszip";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -111,7 +112,31 @@ export function ReadmeViewer({
       <CardContent>
         <div className={expanded ? "" : "max-h-64 overflow-hidden relative"}>
           <div className="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkGithubAlerts]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkGithubAlerts]}
+              rehypePlugins={[rehypeSanitize]}
+              components={{
+                a: ({ href, ...props }: ComponentProps<"a">) => {
+                  if (
+                    href?.startsWith("/") ||
+                    href?.startsWith("#") ||
+                    href?.startsWith(".")
+                  ) {
+                    return <span {...props} />;
+                  }
+                  return (
+                    <a href={href} target="_blank" rel="noopener noreferrer" {...props} />
+                  );
+                },
+                code: ({ children }: ComponentProps<"code">) => {
+                  return (
+                    <code className="rounded-md bg-muted/30 px-1 py-0.5 text-sm border before:hidden after:hidden">
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
               {content!}
             </ReactMarkdown>
           </div>

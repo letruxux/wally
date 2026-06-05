@@ -35,6 +35,7 @@
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^4.11.2",
     "recharts": "3.8.0",
+    "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
     "remark-github-alerts": "^0.1.1",
     "semver": "^7.8.2",
