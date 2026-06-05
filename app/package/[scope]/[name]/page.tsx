@@ -77,9 +77,11 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
           <Link href={`/package/${scope}/${name}`}>v{pkg.version}</Link>
         </Badge>
         {pkg.license && (
-          <Badge variant="outline">
-            <HugeiconsIcon icon={LicenseIcon} /> {pkg.license}
-          </Badge>
+          <a href="https://choosealicense.com/appendix/" target="_blank" rel="noreferrer">
+            <Badge variant="outline">
+              <HugeiconsIcon icon={LicenseIcon} /> {pkg.license}
+            </Badge>
+          </a>
         )}
         <Badge variant="outline">
           <HugeiconsIcon icon={ComputerIcon} /> {toTitleCase(pkg.realm)}
@@ -129,7 +131,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
         <InstallCard scope={scope} name={name} version={pkg.version} />
       </section>
 
-      <div className="mt-4 space-y-8">
+      <div className="mt-4 space-y-4">
         <section>
           <h2 className="text-xl font-semibold">Versions</h2>
           <div className="mt-3 space-y-1">
@@ -168,7 +170,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
           .map(({ title, deps }) => (
             <section key={title}>
               <h2 className="text-xl font-semibold">{title}</h2>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {deps.map(([depName, depVersion]) => {
                   const { ver, name } = parseDepVersionRequirements(depVersion);
                   return (

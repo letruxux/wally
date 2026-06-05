@@ -9,6 +9,22 @@ interface PackageEntry {
   date: string;
 }
 
+function highlightMatch(text: string, query: string) {
+  if (!query) return text;
+
+  const parts = text.split(new RegExp(`(${query})`, "gi"));
+
+  return parts.map((part, i) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <span key={i} className="text-primary">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
 export function SearchAutocomplete({
   packages,
   defaultValue = "",
@@ -69,7 +85,9 @@ export function SearchAutocomplete({
       } else if (query.trim()) {
         const parts = query.trim().split("/");
         if (parts.length === 2 && parts[0] && parts[1]) {
-          router.push(`/package/${encodeURIComponent(parts[0])}/${encodeURIComponent(parts[1])}`);
+          router.push(
+            `/package/${encodeURIComponent(parts[0])}/${encodeURIComponent(parts[1])}`,
+          );
           setShowDropdown(false);
         }
       }
@@ -111,6 +129,7 @@ export function SearchAutocomplete({
               day: "numeric",
               year: "numeric",
             });
+
             return (
               <button
                 key={pkg.name}
@@ -125,8 +144,10 @@ export function SearchAutocomplete({
                 onMouseEnter={() => setSelectedIndex(i)}
               >
                 <span>
-                  <span className="text-foreground">{scope}/</span>
-                  <span className="font-semibold text-foreground">{name}</span>
+                  <span className="text-foreground">{highlightMatch(scope, query)}/</span>
+                  <span className="font-semibold text-foreground">
+                    {highlightMatch(name, query)}
+                  </span>
                 </span>
                 <span className="ml-3 shrink-0 text-[11px] text-muted-foreground">
                   {dateStr}

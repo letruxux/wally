@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import type { WallyPackage } from "@/lib/wally";
 import { PACKAGE_DESCRIPTIONS } from "@/lib/wally";
 import { cn } from "@/lib/utils";
 
