@@ -30,11 +30,11 @@ const luauLanguage: languages.IMonarchLanguage = {
     root: [
       { include: "@whitespace" },
 
-      [/^#!.*$/, "comment.line.shebang"],
+      [/^#![^\n]*/, "comment.line.shebang"],
 
-      [/---/, { token: "comment.line.double-dash.documentation", next: "@docComment" }],
+      [/---[^\n]*/, "comment.line.double-dash.documentation"],
       [/--\[(=*)\[/, { token: "comment.block", next: "@blockComment.$1" }],
-      [/--.*$/, "comment.line.double-dash"],
+      [/--[^\n]*/, "comment.line.double-dash"],
 
       [/"([^"\\]|\\.)*"/, "string.quoted.double"],
       [/'([^'\\]|\\.)*'/, "string.quoted.single"],
@@ -76,18 +76,13 @@ const luauLanguage: languages.IMonarchLanguage = {
 
     blockComment: [
       [/\](=*)\]/, { token: "comment.block", next: "@pop" }],
+      [/\n/, "comment.block"],
       [/./, "comment.block"],
-    ],
-
-    docComment: [
-      [/\](=*)\]/, { token: "comment.block", next: "@pop" }],
-      [/@\w+/, "storage.type.class.luadoc"],
-      [/\n/, { token: "comment.line.double-dash.documentation", next: "@pop" }],
-      [/./, "comment.line.double-dash.documentation"],
     ],
 
     multilineString: [
       [/\](=*)\]/, { token: "string.other.multiline", next: "@pop" }],
+      [/\n/, "string.other.multiline"],
       [/./, "string.other.multiline"],
     ],
 
