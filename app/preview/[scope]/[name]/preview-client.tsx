@@ -284,7 +284,7 @@ export function PreviewClient({
 
   if (loading) {
     return (
-      <div className="py-8 px-4">
+      <div className="py-8 px-4 block w-full max-w-5xl mx-auto">
         <Skeleton className="h-6 mb-2 w-64 bg-foreground/20" />
         <Skeleton className="h-[60vh] bg-foreground/20" />
       </div>
