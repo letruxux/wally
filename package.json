@@ -17,6 +17,7 @@
     "@hugeicons/core-free-icons": "^4.2.0",
     "@hugeicons/react": "^1.1.6",
     "@opennextjs/cloudflare": "^1.19.11",
+    "@plausible-analytics/tracker": "^0.4.5",
     "@tailwindcss/typography": "^0.5.19",
     "@types/jszip": "^3.4.1",
     "class-variance-authority": "^0.7.1",
