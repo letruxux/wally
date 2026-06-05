@@ -17,11 +17,8 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowLeft02Icon,
-  FileCodeIcon,
-  FolderCodeIcon,
-} from "@hugeicons/core-free-icons";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { getFileIconUrl, getFolderIconUrl } from "@/lib/charmed-icons";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -140,10 +137,10 @@ function FileTreeView({
               <span className="text-muted-foreground shrink-0 w-4 text-center">
                 {expandedFolders.has(node.path) ? "▾" : "▸"}
               </span>
-              <HugeiconsIcon
-                icon={FolderCodeIcon}
-                size={14}
-                className="shrink-0 text-muted-foreground"
+              <img
+                src={getFolderIconUrl(node.name, expandedFolders.has(node.path))}
+                className="shrink-0 w-4 h-4"
+                alt=""
               />
               <span className="truncate">{node.name}</span>
             </button>
@@ -170,11 +167,7 @@ function FileTreeView({
             onClick={() => onFileClick(node.path)}
           >
             <span className="w-4 shrink-0" />
-            <HugeiconsIcon
-              icon={FileCodeIcon}
-              size={14}
-              className="shrink-0 text-muted-foreground"
-            />
+            <img src={getFileIconUrl(node.name)} className="shrink-0 w-4 h-4" alt="" />
             <span className="truncate">{node.name}</span>
           </button>
         ),
@@ -307,29 +300,54 @@ export function PreviewClient({
   }
 
   const fileTree = (
-    <FileTreeView
-      nodes={tree}
-      selectedFile={selectedFile}
-      expandedFolders={expandedFolders}
-      onToggleFolder={(path) => {
-        setExpandedFolders((prev) => {
-          const next = new Set(prev);
-          if (next.has(path)) next.delete(path);
-          else next.add(path);
-          return next;
-        });
-      }}
-      onFileClick={(path) => {
-        handleFileClick(path);
-        setShowMobileTree(false);
-      }}
-    />
+    <>
+      <div className="w-full border-b border-border flex items-center mb-1 pb-1 text-muted-foreground text-xs group">
+        <a
+          href="https://github.com/littensy/charmed-icons"
+          target="_blank"
+          rel="noreferrer"
+          className="flex w-full group-hover:underline group-hover:text-blue-100 light:group-hover:text-blue-600 transition-colors"
+        >
+          <span className="flex items-center ml-2">
+            <span className="mr-1 font-mono">charmed-icons</span> by littensy
+          </span>
+          <div className="flex-1"></div>
+          <img
+            src="https://wsrv.nl/?url=https://raw.githubusercontent.com/littensy/charmed-icons/main/assets/icon.png&w=64&h=64&output=webp"
+            alt="charmed-icons"
+            className="size-4 inline mr-2 grayscale-75 group-hover:grayscale-0 transition-all"
+          />
+        </a>
+      </div>
+      <FileTreeView
+        nodes={tree}
+        selectedFile={selectedFile}
+        expandedFolders={expandedFolders}
+        onToggleFolder={(path) => {
+          setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            if (next.has(path)) next.delete(path);
+            else next.add(path);
+            return next;
+          });
+        }}
+        onFileClick={(path) => {
+          handleFileClick(path);
+          setShowMobileTree(false);
+        }}
+      />
+    </>
   );
 
   const editorPanel =
     selectedFile && zip ? (
       <div className="h-full flex flex-col">
-        <div className="px-4 py-2 text-xs text-muted-foreground border-b shrink-0 font-mono truncate">
+        <div className="px-4 py-2 text-xs text-muted-foreground border-b shrink-0 font-mono truncate flex items-center">
+          <img
+            src={getFileIconUrl(selectedFile)}
+            alt={selectedFile.split(".").pop()}
+            className="inline-block mr-2 -mt-0.5"
+          />{" "}
           {selectedFile}
         </div>
         <div className="flex-1">
@@ -373,14 +391,18 @@ export function PreviewClient({
         <Collapsible open={showMobileTree} onOpenChange={setShowMobileTree}>
           <CollapsibleTrigger className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold border-b bg-muted/10 shrink-0">
             <span className="shrink-0 w-4 text-center">{showMobileTree ? "▾" : "▸"}</span>
-            <HugeiconsIcon icon={FolderCodeIcon} size={14} className="shrink-0" />
+            <img
+              src="https://raw.githubusercontent.com/littensy/charmed-icons/main/icons/_folder.svg"
+              className="shrink-0 w-4 h-4"
+              alt=""
+            />
             <span className="truncate">
               {scope}/{name} v{version}
             </span>
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="max-h-[50vh] overflow-auto border-b">
-              <ScrollArea className="h-full">{fileTree}</ScrollArea>
+              <ScrollArea className="h-full mt-1">{fileTree}</ScrollArea>
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -403,7 +425,7 @@ export function PreviewClient({
           <ResizablePanelGroup orientation="horizontal">
             <ResizablePanel defaultSize={35} minSize={20}>
               <div className="h-full bg-muted/10 flex flex-col">
-                <div className="px-3 py-2 text-xs font-semibold text-foreground border-b shrink-0">
+                <div className="mb-1 px-3 py-2 text-xs font-semibold text-foreground border-b shrink-0">
                   {scope}/{name} v{version}
                 </div>
                 <ScrollArea className="flex-1">{fileTree}</ScrollArea>
