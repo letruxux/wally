@@ -19,6 +19,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { getFileIconUrl, getFolderIconUrl } from "@/lib/charmed-icons";
+import { registerLuauLanguage } from "@/lib/luau-language";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -79,8 +80,9 @@ function getLanguage(filename: string): string {
   const ext = filename.split(".").pop()?.toLowerCase();
   switch (ext) {
     case "lua":
-    case "luau":
       return "lua";
+    case "luau":
+      return "luau";
     case "json":
       return "json";
     case "md":
@@ -272,6 +274,13 @@ export function PreviewClient({
 
   const tree = useMemo(() => buildTree(zip ? Object.values(zip.files) : []), [zip]);
 
+  const handleBeforeMount = useCallback(
+    (monaco: Parameters<typeof registerLuauLanguage>[0]) => {
+      registerLuauLanguage(monaco);
+    },
+    [],
+  );
+
   const monacoLanguage = selectedFile ? getLanguage(selectedFile) : "plaintext";
   const monacoTheme = "vs-dark";
 
@@ -352,6 +361,7 @@ export function PreviewClient({
         </div>
         <div className="flex-1">
           <MonacoEditor
+            beforeMount={handleBeforeMount}
             language={monacoLanguage}
             value={fileContent}
             theme={monacoTheme}
