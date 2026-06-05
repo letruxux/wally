@@ -399,7 +399,7 @@ export function PreviewClient({
             </Link>
           </div>
         </div>
-        <div className="h-[calc(100vh-3rem)] border rounded-lg overflow-hidden mb-12">
+        <div className="h-[calc(100vh-16rem)] border rounded-lg overflow-hidden mb-12">
           <ResizablePanelGroup orientation="horizontal">
             <ResizablePanel defaultSize={35} minSize={20}>
               <div className="h-full bg-muted/10 flex flex-col">
