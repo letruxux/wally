@@ -284,7 +284,7 @@ export function PreviewClient({
 
   if (loading) {
     return (
-      <div className="py-8 px-4 block w-full max-w-5xl mx-auto">
+      <div className="py-8 px-4 block w-full max-w-5xl mx-auto mb-4">
         <Skeleton className="h-6 mb-2 w-64 bg-foreground/20" />
         <Skeleton className="h-[60vh] bg-foreground/20" />
       </div>
@@ -293,7 +293,7 @@ export function PreviewClient({
 
   if (error) {
     return (
-      <div className="py-12 px-4">
+      <div className="py-12 px-4 block w-full max-w-5xl mx-auto mb-4">
         <Link
           href={`/package/${scope}/${name}`}
           className="text-sm text-muted-foreground hover:underline"
@@ -399,7 +399,7 @@ export function PreviewClient({
             </Link>
           </div>
         </div>
-        <div className="h-[calc(100vh-3rem)] border rounded-lg overflow-hidden">
+        <div className="h-[calc(100vh-3rem)] border rounded-lg overflow-hidden mb-12">
           <ResizablePanelGroup orientation="horizontal">
             <ResizablePanel defaultSize={35} minSize={20}>
               <div className="h-full bg-muted/10 flex flex-col">
