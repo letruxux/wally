@@ -15,6 +15,7 @@ import remarkGithubAlerts from "remark-github-alerts";
 import "remark-github-alerts/styles/github-colors-light.css";
 import "remark-github-alerts/styles/github-colors-dark-class.css";
 import "remark-github-alerts/styles/github-base.css";
+import { cn } from "@/lib/utils";
 
 function findReadme(files: JSZip.JSZipObject[]): JSZip.JSZipObject | undefined {
   return files.find((f) => !f.dir && f.name.toLowerCase().endsWith("readme.md"));
@@ -142,8 +143,16 @@ export function ReadmeViewer({
                   );
                 },
                 code: ({ children }: ComponentProps<"code">) => {
+                  const isMultiline =
+                    typeof children === "string" && children.includes("\n");
+                  console.log(isMultiline);
                   return (
-                    <code className="rounded-md bg-muted/30 px-1 py-0.5 text-sm border before:hidden after:hidden">
+                    <code
+                      className={cn(
+                        !isMultiline && "rounded-md bg-muted/30 px-1 py-0.5 border",
+                        "before:hidden after:hidden",
+                      )}
+                    >
                       {children}
                     </code>
                   );
