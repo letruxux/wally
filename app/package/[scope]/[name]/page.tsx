@@ -143,10 +143,10 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
               <div key={v.package.version} className="gap-3 text-sm inline">
                 <Badge
                   variant={v.package.version === pkg.version ? "default" : "secondary"}
-                  className="font-mono mr-1"
+                  className="mr-1"
                   asChild
                 >
-                  <Link href={`?v=${v.package.version}`}>{v.package.version}</Link>
+                  <Link href={`?v=${v.package.version}`}>v{v.package.version}</Link>
                 </Badge>
               </div>
             ))}
@@ -154,7 +154,12 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       </section>
 
       <section className="mt-6">
-        <ReadmeViewer scope={scope} name={name} version={pkg.version} readmeOverrideUrl={projectInfo?.readmeOverrideUrl ?? undefined} />
+        <ReadmeViewer
+          scope={scope}
+          name={name}
+          version={pkg.version}
+          readmeOverrideUrl={projectInfo?.readmeOverrideUrl ?? undefined}
+        />
       </section>
 
       <div className="mt-6 space-y-4">

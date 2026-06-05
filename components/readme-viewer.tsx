@@ -101,11 +101,11 @@ export function ReadmeViewer({
   if (loading) {
     return (
       <Card>
-        <CardContent>
-          <Skeleton className="h-4 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-full mb-2" />
-          <Skeleton className="h-4 w-5/6 mb-2" />
-          <Skeleton className="h-4 w-2/3" />
+        <CardContent className="py-2">
+          <Skeleton className="h-4 w-3/4 mb-2 bg-foreground/20" />
+          <Skeleton className="h-4 w-full mb-2 bg-foreground/20" />
+          <Skeleton className="h-4 w-5/6 mb-2 bg-foreground/20" />
+          <Skeleton className="h-4 w-2/3 bg-foreground/20" />
         </CardContent>
       </Card>
     );
