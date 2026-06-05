@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SearchAutocomplete } from "@/components/search-autocomplete";
 import { getPackagesSortedByDate } from "@/lib/registry";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function Header() {
   return (
@@ -13,6 +14,7 @@ export function Header() {
         <SearchAutocomplete packages={getPackagesSortedByDate()} />
 
         <div className="flex items-center gap-2">
+          <ModeToggle />
           <a
             href="https://wally.run"
             target="_blank"
@@ -21,7 +23,7 @@ export function Header() {
             aria-label="Wally"
           >
             <img
-              className="h-5 w-5 grayscale hover:grayscale-0 transition-all"
+              className="size-8 grayscale hover:grayscale-0 transition-all"
               src="https://wally.run/favicon.ico"
               alt="wally.run"
             />
