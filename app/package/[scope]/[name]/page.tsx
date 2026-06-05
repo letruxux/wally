@@ -22,6 +22,7 @@ import { formatDate, toTitleCase } from "@/lib/utils";
 import type { Metadata } from "next";
 import { getProjectInfo } from "@/lib/custom-data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { ReadmeViewer } from "@/components/readme-viewer";
 
 interface PageMetadata {
   params: Promise<{ scope: string; name: string }>;
@@ -131,27 +132,31 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
         <InstallCard scope={scope} name={name} version={pkg.version} />
       </section>
 
-      <div className="mt-4 space-y-4">
-        <section>
-          <h2 className="text-xl font-semibold">Versions</h2>
-          <div className="mt-3 space-y-1">
-            {versions
-              .slice()
-              .reverse()
-              .map((v) => (
-                <div key={v.package.version} className="gap-3 text-sm inline">
-                  <Badge
-                    variant={v.package.version === pkg.version ? "default" : "secondary"}
-                    className="font-mono mr-1"
-                    asChild
-                  >
-                    <Link href={`?v=${v.package.version}`}>{v.package.version}</Link>
-                  </Badge>
-                </div>
-              ))}
-          </div>
-        </section>
+      <section className="mt-6">
+        <h2 className="text-xl font-semibold">Versions</h2>
+        <div className="mt-3 space-y-1">
+          {versions
+            .slice()
+            .reverse()
+            .map((v) => (
+              <div key={v.package.version} className="gap-3 text-sm inline">
+                <Badge
+                  variant={v.package.version === pkg.version ? "default" : "secondary"}
+                  className="font-mono mr-1"
+                  asChild
+                >
+                  <Link href={`?v=${v.package.version}`}>{v.package.version}</Link>
+                </Badge>
+              </div>
+            ))}
+        </div>
+      </section>
 
+      <section className="mt-6">
+        <ReadmeViewer scope={scope} name={name} version={pkg.version} />
+      </section>
+
+      <div className="mt-6 space-y-4">
         {[
           {
             title: "Dependencies",
@@ -185,28 +190,6 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
               </div>
             </section>
           ))}
-
-        {/* {currentVersion.place &&
-          (currentVersion.place["server-packages"] ||
-            currentVersion.place["shared-packages"]) && (
-            <section>
-              <h2 className="text-xl font-semibold">Place Configuration</h2>
-              <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {currentVersion.place["shared-packages"] && (
-                  <p>
-                    <span className="font-medium text-foreground">Shared packages:</span>{" "}
-                    {currentVersion.place["shared-packages"]}
-                  </p>
-                )}
-                {currentVersion.place["server-packages"] && (
-                  <p>
-                    <span className="font-medium text-foreground">Server packages:</span>{" "}
-                    {currentVersion.place["server-packages"]}
-                  </p>
-                )}
-              </div>
-            </section>
-          )} */}
       </div>
     </div>
   );
