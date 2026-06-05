@@ -10,6 +10,7 @@ export interface ProjectCustomData {
   deprecation_message: string;
   name: string;
   github_link: string;
+  readmeOverrideUrl: string;
   type: "original" | "fork" | "uploaded";
 }
 

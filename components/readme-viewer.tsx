@@ -24,10 +24,12 @@ export function ReadmeViewer({
   scope,
   name,
   version,
+  readmeOverrideUrl,
 }: {
   scope: string;
   name: string;
   version: string;
+  readmeOverrideUrl?: string;
 }) {
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,28 +45,39 @@ export function ReadmeViewer({
       setContent(null);
 
       try {
-        const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
-        const res = await fetch(url, {
-          headers: { "Wally-Version": "0.3.2" },
-        });
+        let text: string;
 
-        if (!res.ok) {
-          throw new Error(`Failed to download package (${res.status})`);
-        }
+        if (readmeOverrideUrl) {
+          const res = await fetch(readmeOverrideUrl);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch readme: (${res.status})`);
+          }
+          text = await res.text();
+        } else {
+          const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
+          const res = await fetch(url, {
+            headers: { "Wally-Version": "0.3.2" },
+          });
 
-        const blob = await res.blob();
-        const zip = await JSZip.loadAsync(blob);
-        const files = Object.values(zip.files);
-        const readme = findReadme(files);
+          if (!res.ok) {
+            throw new Error(`Failed to download package (${res.status})`);
+          }
 
-        if (!readme) {
-          setContent(null);
-          setError("No description found.");
-          return;
+          const blob = await res.blob();
+          const zip = await JSZip.loadAsync(blob);
+          const files = Object.values(zip.files);
+          const readme = findReadme(files);
+
+          if (!readme) {
+            setContent(null);
+            setError("No description found.");
+            return;
+          }
+
+          text = await readme.async("string");
         }
 
         if (cancelled) return;
-        const text = await readme.async("string");
         setContent(text);
       } catch (e) {
         if (!cancelled) {

@@ -5,6 +5,7 @@
     "recommended_alternative": "matter-ecs/plasma",
     "deprecation_message": "This repository is no longer maintained. A community fork contintues development.",
     "github_link": "https://github.com/evaera/plasma",
+    "readmeOverrideUrl": null,
     "name": "evaera/plasma"
   },
   "jsdotlua/react": {
@@ -13,6 +14,7 @@
     "recommended_alternative": "haedrix/react",
     "deprecation_message": "No longer updated.",
     "github_link": "https://github.com/jsdotlua/react-lua",
+    "readmeOverrideUrl": null,
     "name": "jsdotlua/react"
   },
   "littensy/remo": {
@@ -21,6 +23,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/littensy/remo",
+    "readmeOverrideUrl": null,
     "name": "littensy/remo"
   },
   "lm-loleris/profilestore": {
@@ -29,6 +32,7 @@
     "recommended_alternative": "ddashdev/profilestore",
     "deprecation_message": "No longer updated, doesn't work well with the new luau type-solver.",
     "github_link": "https://github.com/MadStudioRoblox/profilestore",
+    "readmeOverrideUrl": null,
     "name": "lm-loleris/profilestore"
   },
   "roblox/roact": {
@@ -37,6 +41,7 @@
     "recommended_alternative": "haedrix/react",
     "deprecation_message": "No longer updated.",
     "github_link": "https://github.com/roblox/roact",
+    "readmeOverrideUrl": null,
     "name": "roblox/roact"
   },
   "ddashdev/profilestore": {
@@ -45,6 +50,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/ddashdev/profilestore",
+    "readmeOverrideUrl": null,
     "name": "ddashdev/profilestore"
   },
   "sleitnick/knit": {
@@ -53,6 +59,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/sleitnick/knit",
+    "readmeOverrideUrl": null,
     "name": "sleitnick/knit"
   },
   "bubshurb/evlightning": {
@@ -61,6 +68,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/evaera/evlightning",
+    "readmeOverrideUrl": null,
     "name": "bubshurb/evlightning"
   },
   "ukendio/jecs": {
@@ -69,6 +77,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/ukendio/jecs",
+    "readmeOverrideUrl": null,
     "name": "ukendio/jecs"
   },
   "matter-ecs/matter": {
@@ -77,6 +86,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/matter-ecs/matter",
+    "readmeOverrideUrl": null,
     "name": "matter-ecs/matter"
   },
   "littensy/charm": {
@@ -85,6 +95,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/littensy/charm",
+    "readmeOverrideUrl": null,
     "name": "littensy/charm"
   },
   "evaera/cmdr": {
@@ -93,6 +104,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/evaera/Cmdr",
+    "readmeOverrideUrl": null,
     "name": "evaera/cmdr"
   },
   "littensy/reflex": {
@@ -101,6 +113,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/littensy/reflex",
+    "readmeOverrideUrl": null,
     "name": "littensy/reflex"
   },
   "evaera/matter": {
@@ -109,6 +122,7 @@
     "recommended_alternative": "matter-ecs/matter",
     "deprecation_message": "This repository is no longer maintained. A community fork contintues development.",
     "github_link": "https://github.com/evaera/matter",
+    "readmeOverrideUrl": null,
     "name": "evaera/matter"
   },
   "matter-ecs/plasma": {
@@ -117,6 +131,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/matter-ecs/plasma",
+    "readmeOverrideUrl": null,
     "name": "matter-ecs/plasma"
   },
   "littensy/react-reflex": {
@@ -125,6 +140,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/littensy/react-reflex",
+    "readmeOverrideUrl": null,
     "name": "littensy/react-reflex"
   },
   "evaera/promise": {
@@ -133,6 +149,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/evaera/roblox-lua-promise",
+    "readmeOverrideUrl": "https://raw.githubusercontent.com/evaera/roblox-lua-promise/refs/heads/master/README.md",
     "name": "evaera/promise"
   },
   "littensy/ripple": {
@@ -141,6 +158,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": "https://github.com/littensy/ripple",
+    "readmeOverrideUrl": null,
     "name": "littensy/ripple"
   },
   "jsdotlua/react-roblox": {
@@ -149,6 +167,7 @@
     "recommended_alternative": "haedrix/react-roblox",
     "deprecation_message": "No longer updated.",
     "github_link": "https://github.com/jsdotlua/react-roblox",
+    "readmeOverrideUrl": null,
     "name": "jsdotlua/react-roblox"
   },
   "haedrix/react": {
@@ -157,6 +176,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": null,
+    "readmeOverrideUrl": null,
     "name": "haedrix/react"
   },
   "haedrix/react-roblox": {
@@ -165,6 +185,7 @@
     "recommended_alternative": null,
     "deprecation_message": null,
     "github_link": null,
+    "readmeOverrideUrl": null,
     "name": "haedrix/react-roblox"
   },
   "sunspringdev/roact": {
@@ -173,6 +194,7 @@
     "recommended_alternative": "haedrix/react",
     "deprecation_message": "This repository is deprecated and no longer maintained.",
     "github_link": null,
+    "readmeOverrideUrl": null,
     "name": "sunspringdev/roact"
   }
 }

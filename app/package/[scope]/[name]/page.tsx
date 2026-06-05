@@ -154,7 +154,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       </section>
 
       <section className="mt-6">
-        <ReadmeViewer scope={scope} name={name} version={pkg.version} />
+        <ReadmeViewer scope={scope} name={name} version={pkg.version} readmeOverrideUrl={projectInfo?.readmeOverrideUrl ?? undefined} />
       </section>
 
       <div className="mt-6 space-y-4">
