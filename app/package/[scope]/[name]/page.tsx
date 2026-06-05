@@ -13,14 +13,23 @@ import { PackageCard } from "@/components/package-card";
 import { ComputerIcon, LicenseIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDate, toTitleCase } from "@/lib/utils";
+import type { Metadata } from "next";
 
-export default async function PackagePage({
-  params,
-  searchParams,
-}: {
+interface PageMetadata {
   params: Promise<{ scope: string; name: string }>;
   searchParams: Promise<{ v?: string }>;
-}) {
+}
+
+export async function generateMetadata({ params }: PageMetadata): Promise<Metadata> {
+  const p = await params;
+  const name = `${p.scope}/${p.name}`;
+
+  return {
+    title: `${name} - Wally`,
+  };
+}
+
+export default async function PackagePage({ params, searchParams }: PageMetadata) {
   const { scope, name } = await params;
   const { v } = await searchParams;
   const versions = await fetchPackage(scope, name);
