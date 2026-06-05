@@ -143,6 +143,7 @@ export function convertCasing(name: string, type: CasingType) {
   if (type === "original") return name;
   return name
     .toLowerCase()
+    .replaceAll("_", " ")
     .replaceAll("-", " ")
     .split(/\s+/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
