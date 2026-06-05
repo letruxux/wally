@@ -7,13 +7,17 @@ import dynamic from "next/dynamic";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowLeft01Icon,
   ArrowLeft02Icon,
   FileCodeIcon,
   FolderCodeIcon,
@@ -194,6 +198,7 @@ export function PreviewClient({
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string>("");
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [showMobileTree, setShowMobileTree] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -279,10 +284,7 @@ export function PreviewClient({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        {/* 
-        <Skeleton className="h-8 w-48 mb-4 bg-foreground/20" />
-        <Skeleton className="h-4 w-64 mb-8 bg-foreground/20" /> */}
+      <div className="py-8 px-4">
         <Skeleton className="h-6 mb-2 w-64 bg-foreground/20" />
         <Skeleton className="h-[60vh] bg-foreground/20" />
       </div>
@@ -291,7 +293,7 @@ export function PreviewClient({
 
   if (error) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
+      <div className="py-12 px-4">
         <Link
           href={`/package/${scope}/${name}`}
           className="text-sm text-muted-foreground hover:underline"
@@ -304,9 +306,58 @@ export function PreviewClient({
     );
   }
 
+  const fileTree = (
+    <FileTreeView
+      nodes={tree}
+      selectedFile={selectedFile}
+      expandedFolders={expandedFolders}
+      onToggleFolder={(path) => {
+        setExpandedFolders((prev) => {
+          const next = new Set(prev);
+          if (next.has(path)) next.delete(path);
+          else next.add(path);
+          return next;
+        });
+      }}
+      onFileClick={(path) => {
+        handleFileClick(path);
+        setShowMobileTree(false);
+      }}
+    />
+  );
+
+  const editorPanel =
+    selectedFile && zip ? (
+      <div className="h-full flex flex-col">
+        <div className="px-4 py-2 text-xs text-muted-foreground border-b shrink-0 font-mono truncate">
+          {selectedFile}
+        </div>
+        <div className="flex-1">
+          <MonacoEditor
+            language={monacoLanguage}
+            value={fileContent}
+            theme={monacoTheme}
+            options={{
+              readOnly: true,
+              minimap: { enabled: true },
+              fontSize: 13,
+              lineNumbers: "on",
+              scrollBeyondLastLine: false,
+              wordWrap: "on",
+              automaticLayout: true,
+            }}
+          />
+        </div>
+      </div>
+    ) : (
+      <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+        Select a file to preview
+      </div>
+    );
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-2 flex items-center justify-between">
+    <div>
+      <div className="md:hidden mb-2 flex items-center justify-between px-4 pt-8">
         <div>
           <Link
             href={`/package/${scope}/${name}`}
@@ -318,62 +369,50 @@ export function PreviewClient({
         </div>
       </div>
 
-      <div className="h-[72vh] border rounded-lg overflow-hidden">
-        <ResizablePanelGroup orientation="horizontal">
-          <ResizablePanel defaultSize={35} minSize={20}>
-            <div className="h-full bg-muted/10 flex flex-col">
-              <div className="px-3 py-2 text-xs font-semibold text-foreground border-b shrink-0">
-                {scope}/{name} v{version}
-              </div>
-              <ScrollArea className="flex-1">
-                <FileTreeView
-                  nodes={tree}
-                  selectedFile={selectedFile}
-                  expandedFolders={expandedFolders}
-                  onToggleFolder={(path) => {
-                    setExpandedFolders((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(path)) next.delete(path);
-                      else next.add(path);
-                      return next;
-                    });
-                  }}
-                  onFileClick={handleFileClick}
-                />
-              </ScrollArea>
+      <div className="md:hidden h-[calc(100vh-3rem)] flex flex-col border-t">
+        <Collapsible open={showMobileTree} onOpenChange={setShowMobileTree}>
+          <CollapsibleTrigger className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold border-b bg-muted/10 shrink-0">
+            <span className="shrink-0 w-4 text-center">{showMobileTree ? "▾" : "▸"}</span>
+            <HugeiconsIcon icon={FolderCodeIcon} size={14} className="shrink-0" />
+            <span className="truncate">
+              {scope}/{name} v{version}
+            </span>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="max-h-[50vh] overflow-auto border-b">
+              <ScrollArea className="h-full">{fileTree}</ScrollArea>
             </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={75}>
-            {selectedFile && zip ? (
-              <div className="h-full flex flex-col">
-                <div className="px-4 py-2 text-xs text-muted-foreground border-b shrink-0 font-mono truncate">
-                  {selectedFile}
+          </CollapsibleContent>
+        </Collapsible>
+        <div className="flex-1 min-h-0">{editorPanel}</div>
+      </div>
+
+      <div className="hidden md:block w-full max-w-5xl mx-auto">
+        <div className="mb-2 flex items-center justify-between pt-8">
+          <div>
+            <Link
+              href={`/package/${scope}/${name}`}
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              <HugeiconsIcon size={16} icon={ArrowLeft02Icon} className="inline" /> Back
+              to package info
+            </Link>
+          </div>
+        </div>
+        <div className="h-[calc(100vh-3rem)] border rounded-lg overflow-hidden">
+          <ResizablePanelGroup orientation="horizontal">
+            <ResizablePanel defaultSize={35} minSize={20}>
+              <div className="h-full bg-muted/10 flex flex-col">
+                <div className="px-3 py-2 text-xs font-semibold text-foreground border-b shrink-0">
+                  {scope}/{name} v{version}
                 </div>
-                <div className="flex-1">
-                  <MonacoEditor
-                    language={monacoLanguage}
-                    value={fileContent}
-                    theme={monacoTheme}
-                    options={{
-                      readOnly: true,
-                      minimap: { enabled: true },
-                      fontSize: 13,
-                      lineNumbers: "on",
-                      scrollBeyondLastLine: false,
-                      wordWrap: "on",
-                      automaticLayout: true,
-                    }}
-                  />
-                </div>
+                <ScrollArea className="flex-1">{fileTree}</ScrollArea>
               </div>
-            ) : (
-              <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-                Select a file to preview
-              </div>
-            )}
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={75}>{editorPanel}</ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
       </div>
     </div>
   );
