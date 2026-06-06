@@ -42,6 +42,7 @@ export function InstallCard({
     "package-name-casing",
     "original",
   );
+  const [usePesde, setUsePesde] = useLocalStorage("use-pesde", false);
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
@@ -52,9 +53,15 @@ export function InstallCard({
 
   const tomlLine = useMemo(() => {
     const withCasing = convertCasing(shortName, packageNameCasing);
-    if (pinVersion) return `${withCasing} = "${scope}/${name}@${version}"`;
-    return `${withCasing} = "${scope}/${name}"`;
-  }, [pinVersion, shortName, scope, name, version, packageNameCasing]);
+    if (!usePesde) {
+      if (pinVersion) return `${withCasing} = "${scope}/${name}@${version}"`;
+      return `${withCasing} = "${scope}/${name}"`;
+    } else {
+      if (pinVersion)
+        return `${withCasing} = { wally = "${scope}/${name}", version = "${version}" }`;
+      return `${withCasing} = { wally = "${scope}/${name}" }`;
+    }
+  }, [pinVersion, shortName, scope, name, version, packageNameCasing, usePesde]);
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(tomlLine);
@@ -145,6 +152,8 @@ export function InstallCard({
                 packageNameCasing={packageNameCasing}
                 setPackageNameCasing={setPackageNameCasing}
                 shortName={shortName}
+                usePesde={usePesde}
+                setUsePesde={setUsePesde}
               />
             </DropdownMenu>
           </div>
@@ -160,18 +169,22 @@ function InstallCardSettings({
   packageNameCasing,
   setPackageNameCasing,
   shortName,
+  usePesde,
+  setUsePesde,
 }: {
   pinVersion: boolean;
   setPinVersion: (v: boolean) => void;
   packageNameCasing: CasingType;
   setPackageNameCasing: (v: CasingType) => void;
   shortName: string;
+  usePesde: boolean;
+  setUsePesde: (v: boolean) => void;
 }) {
   return (
     <DropdownMenuContent className="w-40" align="start">
       <DropdownMenuGroup>
         <DropdownMenuLabel>
-          <code>wally.toml</code>
+          <code>{usePesde ? "pesde" : "wally"}.toml</code>
         </DropdownMenuLabel>
         <DropdownMenuCheckboxItem
           onSelect={(e) => e.preventDefault()}
@@ -180,6 +193,27 @@ function InstallCardSettings({
         >
           Pin specific version
         </DropdownMenuCheckboxItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Package manager</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuCheckboxItem
+                onSelect={(e) => e.preventDefault()}
+                checked={!usePesde}
+                onCheckedChange={() => setUsePesde(false)}
+              >
+                Wally
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                onSelect={(e) => e.preventDefault()}
+                checked={usePesde}
+                onCheckedChange={() => setUsePesde(true)}
+              >
+                pesde
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Package name casing</DropdownMenuSubTrigger>
           <DropdownMenuPortal>
