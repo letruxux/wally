@@ -17,6 +17,7 @@ import {
   GithubIcon,
   LicenseIcon,
   PackageIcon,
+  UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { formatDate, toTitleCase } from "@/lib/utils";
@@ -25,6 +26,7 @@ import { getProjectInfo } from "@/lib/custom-data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ReadmeViewer } from "@/components/readme-viewer";
 import { getLicenseUrl } from "@/lib/licenses";
+import { Button } from "@/components/ui/button";
 
 interface PageMetadata {
   params: Promise<{ scope: string; name: string }>;
@@ -76,9 +78,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 mb-4">
-        <Badge variant="secondary" asChild>
-          <Link href={`/package/${scope}/${name}`}>v{pkg.version}</Link>
-        </Badge>
+        <Badge variant="secondary">v{pkg.version}</Badge>
         {pkg.license && (
           <a href={getLicenseUrl(pkg.license)} target="_blank" rel="noreferrer">
             <Badge variant="outline">
@@ -86,6 +86,11 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
             </Badge>
           </a>
         )}
+        <Link href={`/author/${encodeURIComponent(scope)}`}>
+          <Badge variant="outline" className="hover:bg-muted/50">
+            <HugeiconsIcon icon={UserIcon} /> {scope}
+          </Badge>
+        </Link>
         <Badge variant="outline">
           <HugeiconsIcon icon={ComputerIcon} /> {toTitleCase(pkg.realm)}
         </Badge>
@@ -130,14 +135,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
       )}
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">
-          Get{" "}
-          <Link href={`/preview/${scope}/${name}?v=${pkg.version}`}>
-            <Badge variant="outline" className="cursor-pointer hover:bg-muted/50">
-              <HugeiconsIcon icon={EyeIcon} /> Preview
-            </Badge>
-          </Link>
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Get</h2>
         <InstallCard scope={scope} name={name} version={pkg.version} />
       </section>
 

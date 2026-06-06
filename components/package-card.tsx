@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { PACKAGE_DESCRIPTIONS } from "@/lib/wally";
 import { cn } from "@/lib/utils";
 
 export function PackageCard({
@@ -19,7 +18,7 @@ export function PackageCard({
   isDep?: boolean;
 }) {
   const [scope, name] = pkg.name.split("/");
-  const description = pkg.description ?? PACKAGE_DESCRIPTIONS[pkg.name] ?? null;
+  const description = pkg.description ?? null;
 
   return (
     <Link href={`/package/${scope}/${name}`}>

@@ -1,4 +1,5 @@
 import { compare } from "semver";
+import { getPackageDate } from "./registry";
 
 export interface WallyPackage {
   name: string;
@@ -64,36 +65,11 @@ export function parsePackageName(fullName: string): {
   return { scope: parts[0], name: parts.slice(1).join("/") };
 }
 
-export const POPULAR_PACKAGES = [
-  { scope: "evaera", name: "cmdr" },
-  { scope: "roblox", name: "roact" },
-  { scope: "evaera", name: "promise" },
-  { scope: "roblox", name: "testez" },
-  { scope: "sleitnick", name: "knit" },
-  { scope: "howmanysmall", name: "janitor" },
-];
-
-export const PACKAGE_DESCRIPTIONS: Record<string, string> = {
-  "evaera/cmdr": "Extensible command console for Roblox developers",
-  "roblox/roact": "A view management library for Roblox Lua similar to React",
-  "evaera/promise": "Promise implementation for Roblox",
-  "roblox/testez": "BDD-style test and assertion library for Roblox Lua",
-  "sleitnick/knit": "Knit is a lightweight game framework",
-  "howmanysmall/janitor": "Garbage collector object implementation for Roblox",
-};
-
 export function parseDepVersionRequirements(version: string) {
   const parts = version.split("@");
   const ver = parts.at(-1);
   const name = parts.slice(0, -1).join("@");
   return { ver, name };
-}
-
-interface GitHubCommit {
-  commit: {
-    message: string;
-    author: { date: string };
-  };
 }
 
 export async function getVersionDate(
@@ -118,7 +94,12 @@ export async function getVersionDate(
     });
     if (!res.ok) return null;
 
-    const commits = (await res.json()) as GitHubCommit[];
+    const commits = (await res.json()) as {
+      commit: {
+        message: string;
+        author: { date: string };
+      };
+    }[];
     if (!Array.isArray(commits)) return null;
 
     for (const c of commits) {
@@ -135,6 +116,62 @@ export async function getVersionDate(
   }
 
   return null;
+}
+
+export interface PackageBrief {
+  scope: string;
+  name: string;
+  version: string;
+  description: string | null;
+  date: string | null;
+}
+
+export async function searchPackagesByAuthor(author: string): Promise<PackageBrief[]> {
+  const url = `https://api.github.com/search/code?q=path:${author}+repo:UpliftGames/wally-index&per_page=100`;
+
+  const res = await fetch(url, {
+    headers: {
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "wallylol",
+      Authorization: `Bearer ${process.env.GH_TOKEN}`,
+    },
+    /* next: { revalidate: 3600 }, */
+  });
+
+  if (!res.ok) return [];
+
+  const data = (await res.json()) as {
+    items?: Array<{ path: string }>;
+  };
+
+  const paths = [...new Set(data.items?.map((item) => item.path) ?? [])];
+
+  const results = await Promise.allSettled(
+    paths.map(async (path) => {
+      const parts = path.split("/");
+      const scope = parts[0];
+      const name = parts.slice(1).join("/");
+      const versions = await fetchPackage(scope, name);
+      if (!versions) return null;
+
+      const latest = getLatestVersion(versions);
+
+      return {
+        scope,
+        name,
+        version: latest.package.version,
+        description: latest.package.description,
+        date: getPackageDate(`${scope}/${name}`),
+      };
+    }),
+  );
+
+  return results
+    .filter(
+      (r): r is PromiseFulfilledResult<PackageBrief> =>
+        r.status === "fulfilled" && r.value !== null,
+    )
+    .map((r) => r.value);
 }
 
 export type CasingType = "original" | "caps";

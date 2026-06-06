@@ -4,7 +4,7 @@
 
 - Dark mode
 - Update dates
-- Customizable wally.toml entry
-- README.md
+- Customizable wally.toml copy (casing, pin version)
+- show readme on page
 - Unofficial deprecations, replacements, and deprecation messages
-- Code inspector (zip preview) - [TODO]
+- Code inspector (zip preview)

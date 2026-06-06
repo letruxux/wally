@@ -3,7 +3,12 @@
 import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SlidersHorizontalIcon } from "@hugeicons/core-free-icons";
+import {
+  DownloadIcon,
+  EyeIcon,
+  Loading02FreeIcons,
+  SlidersHorizontalIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DropdownMenu,
@@ -19,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CasingType, convertCasing } from "@/lib/wally";
 import { useLocalStorage } from "usehooks-ts";
+import Link from "next/link";
 
 export function InstallCard({
   scope,
@@ -37,6 +43,9 @@ export function InstallCard({
     "original",
   );
 
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+
   const shortName = useMemo(() => {
     return name.split("/").pop()!;
   }, [name]);
@@ -54,16 +63,21 @@ export function InstallCard({
   }, [tomlLine]);
 
   const handleDownload = useCallback(async () => {
-    const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
-    const res = await fetch(url, {
-      headers: { "Wally-Version": "0.3.2" },
-    });
-    const blob = await res.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${scope}-${name}-${version}.zip`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    setIsDownloading(true);
+    try {
+      const url = `https://api.wally.run/v1/package-contents/${scope}/${name}/${version}`;
+      const res = await fetch(url, {
+        headers: { "Wally-Version": "0.3.2" },
+      });
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${scope}-${name}-${version}.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } finally {
+      setIsDownloading(false);
+    }
   }, [scope, name, version]);
 
   return (
@@ -89,8 +103,35 @@ export function InstallCard({
             ...or download it as a .zip file
           </p>
           <div className="flex items-center gap-1">
-            <Button variant="outline" size="sm" onClick={handleDownload}>
-              Download
+            <Link href={`/preview/${scope}/${name}?v=${version}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isLoadingPreview}
+                className="group overflow-hidden gap-0"
+                onClick={() => setIsLoadingPreview(true)}
+              >
+                <HugeiconsIcon icon={EyeIcon} />
+                <span className="ml-0 group-hover:ml-1 max-w-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-w-20 group-hover:opacity-100">
+                  Preview
+                </span>
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="group overflow-hidden gap-0"
+            >
+              {isDownloading ? (
+                <HugeiconsIcon icon={Loading02FreeIcons} className="animate-spin" />
+              ) : (
+                <HugeiconsIcon icon={DownloadIcon} />
+              )}
+              <span className="ml-0 group-hover:ml-1 max-w-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-w-20 group-hover:opacity-100">
+                Download
+              </span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
