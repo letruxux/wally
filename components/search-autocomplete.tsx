@@ -10,10 +10,15 @@ interface PackageEntry {
   date: string;
 }
 
+function escapeRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function highlightMatch(text: string, query: string) {
   if (!query) return text;
 
-  const parts = text.split(new RegExp(`(${query})`, "gi"));
+  const escaped = escapeRegex(query);
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
 
   return parts.map((part, i) =>
     part.toLowerCase() === query.toLowerCase() ? (
@@ -23,6 +28,27 @@ function highlightMatch(text: string, query: string) {
     ) : (
       part
     ),
+  );
+}
+
+function renderHighlightedName(
+  scope: string,
+  name: string,
+  query: string,
+) {
+  const slashIdx = query.indexOf("/");
+  const scopeQuery = slashIdx >= 0 ? query.slice(0, slashIdx) : query;
+  const nameQuery = slashIdx >= 0 ? query.slice(slashIdx + 1) : query;
+
+  return (
+    <>
+      <span className="text-foreground">
+        {highlightMatch(scope, scopeQuery)}/
+      </span>
+      <span className="font-semibold text-foreground">
+        {highlightMatch(name, nameQuery)}
+      </span>
+    </>
   );
 }
 
@@ -185,12 +211,7 @@ export function SearchAutocomplete({
                     onMouseEnter={() => setSelectedIndex(virtualItem.index)}
                   >
                     <span>
-                      <span className="text-foreground">
-                        {highlightMatch(scope, query)}/
-                      </span>
-                      <span className="font-semibold text-foreground">
-                        {highlightMatch(name, query)}
-                      </span>
+                      {renderHighlightedName(scope, name, query)}
                     </span>
                     <span className="ml-3 shrink-0 text-[11px] text-muted-foreground">
                       {dateStr}
