@@ -161,7 +161,7 @@ export async function searchPackagesByAuthor(author: string): Promise<PackageBri
         name,
         version: latest.package.version,
         description: latest.package.description,
-        date: getPackageDate(`${scope}/${name}`),
+        date: await getPackageDate(`${scope}/${name}`),
       };
     }),
   );
