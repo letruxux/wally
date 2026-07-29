@@ -3,7 +3,7 @@ import { SearchAutocomplete } from "@/components/search-autocomplete";
 import { getPackagesSortedByDate } from "@/lib/registry";
 import { ModeToggle } from "@/components/mode-toggle";
 
-export function Header() {
+export async function Header() {
   return (
     <header className="border-b">
       <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3 sm:px-6">
@@ -11,7 +11,7 @@ export function Header() {
           Wally
         </Link>
 
-        <SearchAutocomplete packages={getPackagesSortedByDate()} />
+        <SearchAutocomplete packages={await getPackagesSortedByDate()} />
 
         <div className="flex items-center gap-2">
           <ModeToggle />

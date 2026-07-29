@@ -1,22 +1,25 @@
-import registry from "@/data/registry.json"
+const REGISTRYJSON_URL =
+  "https://raw.githubusercontent.com/letruxux/wally-registry-dates/refs/heads/master/data/registry.json";
 
 interface PackageEntry {
-  name: string
-  date: string
+  name: string;
+  date: string;
 }
 
-const r = registry as Record<string, string>
+const registryPromise: Promise<Record<string, string>> = fetch(REGISTRYJSON_URL).then(
+  (res) => res.json(),
+);
 
-export function getPackageNames(): string[] {
-  return Object.keys(r)
+export async function getPackageNames(): Promise<string[]> {
+  return Object.keys(await registryPromise);
 }
 
-export function getPackageDate(name: string): string | null {
-  return r[name] ?? null
+export async function getPackageDate(name: string): Promise<string | null> {
+  return (await registryPromise)[name] ?? null;
 }
 
-export function getPackagesSortedByDate(): PackageEntry[] {
-  return Object.entries(r)
+export async function getPackagesSortedByDate(): Promise<PackageEntry[]> {
+  return Object.entries(await registryPromise)
     .map(([name, date]) => ({ name, date }))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }

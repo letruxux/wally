@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils";
 const RECENT_COUNT = 12;
 
 export default async function Home() {
-  const recent = getPackagesSortedByDate().slice(0, RECENT_COUNT);
+  const recent = (await getPackagesSortedByDate()).slice(0, RECENT_COUNT);
 
   const results = await Promise.allSettled(
     recent.map(({ name }) => {
@@ -15,18 +15,20 @@ export default async function Home() {
     }),
   );
 
-  const packages = results
-    .map((r) => {
-      if (r.status === "rejected" || !r.value) return null;
-      const latest = getLatestVersion(r.value);
-      const pkgDate = getPackageDate(latest.package.name);
-      const dateString = pkgDate ? ` | last updated: ${formatDate(pkgDate)}` : "";
-      return {
-        pkg: latest.package,
-        version: latest.package.version + dateString,
-      };
-    })
-    .filter(Boolean);
+  const packages = await Promise.all(
+    results
+      .map(async (r) => {
+        if (r.status === "rejected" || !r.value) return null;
+        const latest = getLatestVersion(r.value);
+        const pkgDate = await getPackageDate(latest.package.name);
+        const dateString = pkgDate ? ` | last updated: ${formatDate(pkgDate)}` : "";
+        return {
+          pkg: latest.package,
+          version: latest.package.version + dateString,
+        };
+      })
+      .filter(Boolean),
+  );
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6">

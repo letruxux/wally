@@ -59,7 +59,7 @@ export default async function PackagePage({ params, searchParams }: PageMetadata
   const packageName = `${scope}/${name}`;
   const lastUpdated = version
     ? await getVersionDate(scope, name, version)
-    : getPackageDate(packageName);
+    : await getPackageDate(packageName);
   const projectInfo = getProjectInfo(packageName);
 
   const deps = Object.entries(currentVersion.dependencies);
