@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Plausible } from "@/components/plausible";
+import NextTopLoader from "nextjs-toploader";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", outfit.variable)} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
+        <NextTopLoader color="#eab308" height={2} showSpinner={false} />
         <ThemeProvider
           attribute="class"
           defaultTheme="wally"
